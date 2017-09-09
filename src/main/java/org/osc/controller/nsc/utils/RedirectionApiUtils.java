@@ -77,7 +77,8 @@ public class RedirectionApiUtils {
             egressEntity = makeNetworkElementEntity(egress);
         }
 
-        return new InspectionPortEntity(inspectionPortElement.getElementId(), ingressEntity, egressEntity);
+        return new InspectionPortEntity(inspectionPortElement.getElementId(), inspectionPortElement.getParentId(),
+                                        ingressEntity, egressEntity);
     }
 
     public InspectionHookEntity makeInspectionHookEntity(NetworkElement inspectedPort,
@@ -166,9 +167,11 @@ public class RedirectionApiUtils {
         CriteriaBuilder cb = this.em.getCriteriaBuilder();
         CriteriaQuery<InspectionPortEntity> criteria = cb.createQuery(InspectionPortEntity.class);
         Root<InspectionPortEntity> root = criteria.from(InspectionPortEntity.class);
+
         criteria.select(root).where(cb.and(
                 cb.equal(root.join("ingressPort").get("elementId"), ingressId),
                 cb.equal(root.join("egressPort").get("elementId"), egressId)));
+
         Query q= this.em.createQuery(criteria);
 
         try {
@@ -268,9 +271,12 @@ public class RedirectionApiUtils {
         CriteriaBuilder cb = this.em.getCriteriaBuilder();
         CriteriaQuery<InspectionHookEntity> criteria = cb.createQuery(InspectionHookEntity.class);
         Root<InspectionHookEntity> root = criteria.from(InspectionHookEntity.class);
+
         criteria.select(root).where(cb.and(
                 cb.equal(root.join("inspectedPort").get("elementId"), inspectedId),
                 cb.equal(root.join("inspectionPort").get("elementId"), portId)));
+
+
         Query q= this.em.createQuery(criteria);
 
         try {
